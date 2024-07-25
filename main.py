@@ -9,7 +9,8 @@ from bs4 import BeautifulSoup
 import re
 
 # Load pre-trained object detection model from TensorFlow Hub
-model_url = 'https://tfhub.dev/google/openimages_v4/inception_resnet_v2/1'
+model_url = 'https://tfhub.dev/google/faster_rcnn/openimages_v4/inception_resnet_v2/1'
+
 model = hub.load(model_url)
 
 # Load pre-trained classification model from TensorFlow Hub
