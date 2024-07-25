@@ -1,0 +1,8 @@
+streamlit
+tensorflow
+tensorflow-hub
+numpy
+opencv-python-headless
+pillow
+requests
+beautifulsoup4
