@@ -10,14 +10,14 @@ from bs4 import BeautifulSoup
 # Load pre-trained object detection model from TensorFlow Hub
 def load_model(model_url):
     try:
-        model = hub.Module(model_url)
+        model = hub.load(model_url)
         return model
     except Exception as e:
         st.error(f"Error loading model: {e}")
         return None
 
 # Example model URL (ensure this is correct and available)
-model_url = 'https://kaggle.com/models/google/faster-rcnn-inception-resnet-v2/frameworks/TensorFlow1/variations/faster-rcnn-openimages-v4-inception-resnet-v2/versions/1'
+model_url = 'https://tfhub.dev/google/openimages_v4/inception_resnet_v2/1'
 model = load_model(model_url)
 
 # Load pre-trained classification model from TensorFlow Hub
@@ -44,6 +44,7 @@ def detect_objects(image):
     image_tensor = image_tensor / 255.0  # Normalize
     image_tensor = image_tensor[tf.newaxis, ...]  # Add batch dimension
 
+    # Assuming the model outputs 'detection_boxes', 'detection_scores', and 'detection_classes'
     results = model(image_tensor)
     boxes = results['detection_boxes'][0].numpy()
     scores = results['detection_scores'][0].numpy()
@@ -103,7 +104,7 @@ if uploaded_file is not None:
         st.image(image_with_boxes, caption='Detected Objects', use_column_width=True)
 
         # Example of handling detected objects
-        class_labels = get_class_labels()
+        class_labels = {0: 'Example Object'}  # Replace with actual class labels
         if boxes is not None and len(boxes) > 0:
             st.write("Detected Objects:")
             for i, box in enumerate(boxes):
