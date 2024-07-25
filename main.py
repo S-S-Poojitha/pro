@@ -6,7 +6,6 @@ from PIL import Image
 import cv2
 import requests
 from bs4 import BeautifulSoup
-import re
 
 # Load pre-trained object detection model from TensorFlow Hub
 def load_model(model_url):
@@ -18,7 +17,7 @@ def load_model(model_url):
         return None
 
 # Example model URL (ensure this is correct and available)
-model_url = 'https://tfhub.dev/google/faster_rcnn/openimages_v4/inception_resnet_v2/1'
+model_url = 'https://tfhub.dev/google/openimages_v4/inception_resnet_v2/1'
 model = load_model(model_url)
 
 # Load pre-trained classification model from TensorFlow Hub
@@ -104,22 +103,23 @@ if uploaded_file is not None:
         st.image(image_with_boxes, caption='Detected Objects', use_column_width=True)
 
         # Example of handling detected objects
+        class_labels = get_class_labels()
         if boxes is not None and len(boxes) > 0:
             st.write("Detected Objects:")
             for i, box in enumerate(boxes):
                 if scores[i] > 0.5:
-                    st.write(f"Object {i + 1}: Class ID {int(classes[i])}, Score: {scores[i]:.2f}")
+                    class_id = int(classes[i])
+                    label = class_labels.get(class_id, 'Unknown')
+                    st.write(f"Object {i + 1}: {label}, Score: {scores[i]:.2f}")
                     
-                    # For simplicity, use class ID to query related images
-                    # In practice, you should use a more meaningful label
-                    class_label = f"object_class_{int(classes[i])}"
-                    st.write(f"Searching for images related to: {class_label}")
+                    # For simplicity, use class label to query related images
+                    st.write(f"Searching for images related to: {label}")
 
                     # Scrape images related to the detected object
-                    image_links = scrape_images(class_label)
+                    image_links = scrape_images(label)
                     
                     st.write("Related Images Found:")
                     for link in image_links:
                         st.image(link, caption='Related Image', use_column_width=True)
-        else:
-            st.write("No objects detected.")
+    else:
+        st.write("No objects detected.")
