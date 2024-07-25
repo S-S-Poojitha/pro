@@ -9,15 +9,36 @@ from bs4 import BeautifulSoup
 import re
 
 # Load pre-trained object detection model from TensorFlow Hub
-model_url = 'https://tfhub.dev/google/faster_rcnn/openimages_v4/inception_resnet_v2/1'  # Updated model URL
-model = hub.load(model_url)
+def load_model(model_url):
+    try:
+        model = hub.load(model_url)
+        return model
+    except Exception as e:
+        st.error(f"Error loading model: {e}")
+        return None
+
+# Example model URL (ensure this is correct and available)
+model_url = 'https://tfhub.dev/google/faster_rcnn/openimages_v4/inception_resnet_v2/1'
+model = load_model(model_url)
 
 # Load pre-trained classification model from TensorFlow Hub
+def load_classifier(classifier_url):
+    try:
+        classifier = hub.load(classifier_url)
+        return classifier
+    except Exception as e:
+        st.error(f"Error loading classifier: {e}")
+        return None
+
+# Example classification model URL
 classifier_url = 'https://tfhub.dev/google/imagenet/inception_v3/feature_vector/4'
-classifier = hub.load(classifier_url)
+classifier = load_classifier(classifier_url)
 
 # Function to perform object detection
 def detect_objects(image):
+    if model is None:
+        st.error("Object detection model not loaded.")
+        return None, None, None
     image_np = np.array(image)
     image_tensor = tf.convert_to_tensor(image_np, dtype=tf.float32)
     image_tensor = tf.image.resize(image_tensor, [300, 300])
@@ -43,6 +64,9 @@ def draw_boxes(image, boxes, scores, threshold=0.5):
 
 # Function to classify the object
 def classify_object(image):
+    if classifier is None:
+        st.error("Classifier model not loaded.")
+        return None
     image_np = np.array(image)
     image_tensor = tf.convert_to_tensor(image_np, dtype=tf.float32)
     image_tensor = tf.image.resize(image_tensor, [299, 299])
@@ -75,26 +99,27 @@ if uploaded_file is not None:
 
     # Perform object detection
     boxes, scores, classes = detect_objects(uploaded_image)
-    image_with_boxes = draw_boxes(uploaded_image, boxes, scores)
-    st.image(image_with_boxes, caption='Detected Objects', use_column_width=True)
+    if boxes is not None:
+        image_with_boxes = draw_boxes(uploaded_image, boxes, scores)
+        st.image(image_with_boxes, caption='Detected Objects', use_column_width=True)
 
-    # Example of handling detected objects
-    if boxes is not None and len(boxes) > 0:
-        st.write("Detected Objects:")
-        for i, box in enumerate(boxes):
-            if scores[i] > 0.5:
-                st.write(f"Object {i + 1}: Class ID {int(classes[i])}, Score: {scores[i]:.2f}")
-                
-                # For simplicity, use class ID to query related images
-                # In practice, you should use a more meaningful label
-                class_label = f"object_class_{int(classes[i])}"
-                st.write(f"Searching for images related to: {class_label}")
+        # Example of handling detected objects
+        if boxes is not None and len(boxes) > 0:
+            st.write("Detected Objects:")
+            for i, box in enumerate(boxes):
+                if scores[i] > 0.5:
+                    st.write(f"Object {i + 1}: Class ID {int(classes[i])}, Score: {scores[i]:.2f}")
+                    
+                    # For simplicity, use class ID to query related images
+                    # In practice, you should use a more meaningful label
+                    class_label = f"object_class_{int(classes[i])}"
+                    st.write(f"Searching for images related to: {class_label}")
 
-                # Scrape images related to the detected object
-                image_links = scrape_images(class_label)
-                
-                st.write("Related Images Found:")
-                for link in image_links:
-                    st.image(link, caption='Related Image', use_column_width=True)
-    else:
-        st.write("No objects detected.")
+                    # Scrape images related to the detected object
+                    image_links = scrape_images(class_label)
+                    
+                    st.write("Related Images Found:")
+                    for link in image_links:
+                        st.image(link, caption='Related Image', use_column_width=True)
+        else:
+            st.write("No objects detected.")
