@@ -10,7 +10,7 @@ from bs4 import BeautifulSoup
 # Load pre-trained object detection model from TensorFlow Hub
 def load_model(model_url):
     try:
-        model = hub.load(model_url)
+        model = hub.Module(model_url)
         return model
     except Exception as e:
         st.error(f"Error loading model: {e}")
