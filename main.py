@@ -17,7 +17,7 @@ def load_model(model_url):
         return None
 
 # Example model URL (ensure this is correct and available)
-model_url = 'https://tfhub.dev/google/openimages_v4/inception_resnet_v2/1'
+model_url = 'https://kaggle.com/models/google/faster-rcnn-inception-resnet-v2/frameworks/TensorFlow1/variations/faster-rcnn-openimages-v4-inception-resnet-v2/versions/1'
 model = load_model(model_url)
 
 # Load pre-trained classification model from TensorFlow Hub
