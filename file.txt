@@ -1,1 +1,3 @@
 pip install tensorflow opencv-python-headless
+pip install tensorflow tensorflow-hub
+
