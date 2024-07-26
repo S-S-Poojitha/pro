@@ -9,9 +9,15 @@ from sklearn.metrics.pairwise import cosine_similarity
 # Set the dataset path
 dataset_path = 'fashion_dataset'
 
+# Initialize the MobileNetV2 model once
+@st.cache_resource
+def load_model():
+    return tf.keras.applications.MobileNetV2(weights='imagenet', include_top=False, pooling='avg')
+
+model = load_model()
+
 # Function to extract features from an image using MobileNetV2
 def extract_features(image_path):
-    model = tf.keras.applications.MobileNetV2(weights='imagenet', include_top=False, pooling='avg')
     img = Image.open(image_path).resize((224, 224))
     img = np.array(img) / 255.0
     img = np.expand_dims(img, axis=0)
