@@ -9,7 +9,7 @@ from sklearn.preprocessing import normalize
 import cv2  # For color similarity using histogram comparison
 
 # Set the dataset path
-dataset_path = 'fashion_dataset'
+dataset_path = 'fashion'
 
 @st.cache_resource
 def load_model():
